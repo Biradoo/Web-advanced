@@ -1,0 +1,331 @@
+### Test 1: Register a New User (Valid Registration)
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "newUserPassword123"
+}
+
+### Test 2: Register a User with Existing Username
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "newPassword"
+}
+
+### Test 3: Register a User without Username
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "password": "missingUsername"
+}
+
+### Test 4: Register a User without Password
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "username": "missingPassword"
+}
+
+### Test 5: Login with Valid Credentials (Admin User)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+###
+@adminToken = {{$response.body.token}}
+
+### Test 6: Login with Valid Credentials (Bidder User)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "password"
+}
+
+###
+@bidderToken = {{$response.body.token}}
+
+### Test 7: Login with Invalid Credentials (Incorrect Password)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "wrongPassword"
+}
+
+### Test 8: Login with Non-Existent Username
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "nonExistentUser",
+  "password": "somePassword"
+}
+
+### Test 9: Create a New Auction (No Token Provided)
+POST http://localhost:3000/api/auctions
+Content-Type: application/json
+
+{
+  "name": "New Auction Item",
+  "attributes": {
+    "pokemon": "Pikachu",
+    "set": "Base Set",
+    "year": 2000,
+    "grade": 10,
+    "gradingCompany": "PSA",
+    "holo": "Yes"
+  },
+  "currentPrice": 1500,
+  "endDate": "2024-12-31T23:59:00",
+  "description": "An auction item created without authorization."
+}
+
+### Test 10: Create a New Auction (Valid Token, but Not Admin)
+POST http://localhost:3000/api/auctions
+Content-Type: application/json
+Authorization: Bearer {{bidderToken}}
+
+{
+  "name": "New Auction Item",
+  "attributes": {
+    "pokemon": "Pikachu",
+    "set": "Base Set",
+    "year": 2000,
+    "grade": 10,
+    "gradingCompany": "PSA",
+    "holo": "Yes"
+  },
+  "currentPrice": 1500,
+  "endDate": "2024-12-31T23:59:00",
+  "description": "An auction item created by a non-admin user."
+}
+
+### Test 11: Create a New Auction (Valid Token, Admin Role)
+POST http://localhost:3000/api/auctions
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "New Auction Item",
+  "attributes": {
+    "pokemon": "Pikachu",
+    "set": "Base Set",
+    "year": 2000,
+    "grade": 10,
+    "gradingCompany": "PSA",
+    "holo": "Yes"
+  },
+  "currentPrice": 1500,
+  "endDate": "2024-12-31T23:59:00",
+  "description": "An auction item created by an admin user."
+}
+
+### Test 12: Create Auction with Invalid Current Price (Non-Numeric)
+POST http://localhost:3000/api/auctions
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "New Auction Item",
+  "attributes": {
+    "pokemon": "Pikachu",
+    "set": "Base Set",
+    "year": 2000,
+    "grade": 10,
+    "gradingCompany": "PSA",
+    "holo": "Yes"
+  },
+  "currentPrice": "invalidPrice",
+  "endDate": "2024-12-31T23:59:00",
+  "description": "Invalid current price for auction."
+}
+
+### Test 13: Create Auction with Invalid End Date
+POST http://localhost:3000/api/auctions
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "New Auction Item",
+  "attributes": {
+    "pokemon": "Pikachu",
+    "set": "Base Set",
+    "year": 2000,
+    "grade": 10,
+    "gradingCompany": "PSA",
+    "holo": "Yes"
+  },
+  "currentPrice": 1500,
+  "endDate": "invalid-date",
+  "description": "Invalid end date for auction."
+}
+
+### Test 14: Create Auction with Missing Attributes
+POST http://localhost:3000/api/auctions
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "New Auction Item",
+  "currentPrice": 1500,
+  "endDate": "2024-12-31T23:59:00",
+  "description": "Auction missing attributes."
+}
+
+### Test 15: Get All Auctions
+GET http://localhost:3000/api/auctions
+
+### Test 16: Get Specific Auction by ID
+GET http://localhost:3000/api/auctions/1
+
+### Test 17: Get Auction by Invalid ID
+GET http://localhost:3000/api/auctions/9999
+
+### Test 18: Update Auction (Admin Only, Valid Token)
+PUT http://localhost:3000/api/auctions/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Updated Auction Item",
+  "attributes": {
+    "pokemon": "Pikachu",
+    "set": "Base Set",
+    "year": 2000,
+    "grade": 10,
+    "gradingCompany": "PSA",
+    "holo": "Yes"
+  },
+  "currentPrice": 2000,
+  "endDate": "2024-12-31T23:59:00",
+  "description": "An updated description for the auction."
+}
+
+### Test 19: Delete Auction (Admin Only, Valid Token)
+DELETE http://localhost:3000/api/auctions/1
+Authorization: Bearer {{adminToken}}
+
+### Test 20: Place a Bid on an Auction (No Token Provided)
+POST http://localhost:3000/api/bid/1/bid
+Content-Type: application/json
+
+{
+  "amount": 2000
+}
+
+### Test 21: Place a Bid on an Auction (Valid Token, but Not a Bidder)
+POST http://localhost:3000/api/bid/1/bid
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "amount": 2500
+}
+
+### Test 22: Place a Bid on an Auction (Valid Token, Bidder Role)
+POST http://localhost:3000/api/bid/1/bid
+Content-Type: application/json
+Authorization: Bearer {{bidderToken}}
+
+{
+  "amount": 3000
+}
+
+### Test 23: Place a Bid Lower Than Current Price
+POST http://localhost:3000/api/bid/1/bid
+Content-Type: application/json
+Authorization: Bearer {{bidderToken}}
+
+{
+  "amount": 100
+}
+
+### Test 24: Place a Bid with Non-Numeric Amount
+POST http://localhost:3000/api/bid/1/bid
+Content-Type: application/json
+Authorization: Bearer {{bidderToken}}
+
+{
+  "amount": "invalidAmount"
+}
+
+### Test 25: Get All Bids for a Specific Auction
+GET http://localhost:3000/api/auctions/1/bids
+
+### Test 26: Get All Users (Admin Only)
+GET http://localhost:3000/api/users
+Authorization: Bearer {{adminToken}}
+
+### Test 27: Get User by ID (Admin Only)
+GET http://localhost:3000/api/users/2
+Authorization: Bearer {{adminToken}}
+
+### Test 28: Delete User by ID (Admin Only)
+DELETE http://localhost:3000/api/users/2
+Authorization: Bearer {{adminToken}}
+
+### Test 29: Access Non-existent Route
+GET http://localhost:3000/non-existent-route
+
+### Test 30: Logout without Providing Token
+POST http://localhost:3000/api/auth/logout
+Content-Type: application/json
+
+### Test 31: Filter Auctions by Name (Pikachu)
+GET http://localhost:3000/api/auctions?name=Pikachu
+Accept: application/json
+
+### Test 32: Filter Auctions by Set (Base Set)
+GET http://localhost:3000/api/auctions?set=Base%20Set
+Accept: application/json
+
+### Test 33: Filter Auctions by Grading Company (PSA)
+
+GET http://localhost:3000/api/auctions?gradingCompany=PSA
+Accept: application/json
+
+### Test 34: Sort Auctions by Price (Ascending)
+GET http://localhost:3000/api/auctions?sort=price
+Accept: application/json
+
+### Test 35: Sort Auctions by End Date (Ascending)
+GET http://localhost:3000/api/auctions?sort=endDate
+Accept: application/json
+
+### Test 36: Filter Ongoing Auctions
+GET http://localhost:3000/api/auctions?status=ongoing
+Accept: application/json
+
+### Test 37: Filter Ended Auctions
+GET http://localhost:3000/api/auctions?status=ended
+Accept: application/json
+
+### Test 38: Fetch User’s Won Auctions (Bidder Only)
+GET http://localhost:3000/api/users/1/won-auctions
+Authorization: Bearer {{bidderToken}}
+
+### Test 39: Place a Bid on an Ended Auction (Should Fail)
+POST http://localhost:3000/api/auctions/1/bid
+Content-Type: application/json
+Authorization: Bearer {{bidderToken}}
+
+{
+  "amount": 100
+}
+
+### Test 40: Delete Non-Existent Auction (Admin Only)
+DELETE http://localhost:3000/api/auctions/9999
+Authorization: Bearer {{adminToken}}

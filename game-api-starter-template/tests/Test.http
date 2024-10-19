@@ -1,0 +1,142 @@
+GET {{protocol}}{{host}}:{{port}}/games
+Accept: application/json
+
+###
+GET http://localhost:3000/games?genre=RPG
+Accept: application/json
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 200, "Response status is not 200")
+        }
+    );
+%}
+
+###
+GET {{protocol}}{{host}}:{{port}}/games/2
+Accept: application/json
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 200, "Response status is not 200")
+        }
+    );
+%}
+
+###
+GET {{protocol}}{{host}}:{{port}}/games/DitIdGeenId
+Accept: application/json
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 404, "Response status is not 404")
+        }
+    );
+%}
+
+###
+POST {{protocol}}{{host}}:{{port}}/games
+Content-Type: application/json
+Accept: application/json
+
+{
+  "steam_key": "NEW_KEY",
+  "name": "NAME",
+  "publisher": "PUBLISHER",
+  "genre": "GENRE"
+}
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 201, "Response status is not 201")
+        }
+    );
+%}
+
+###
+POST {{protocol}}{{host}}:{{port}}/games
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "steam_key": "NEW_KEY",
+  "name": "NAME",
+  "publisher": "PUBLISHER",
+  "genre": "GENRE"
+}
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 400, "Response status is not 400")
+        }
+    );
+%}
+
+###
+POST {{protocol}}{{host}}:{{port}}/games
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "NAME",
+  "publisher": "PUBLISHER",
+  "genre": "GENRE"
+}
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 400, "Response status is not 400")
+        }
+    );
+%}
+
+###
+POST {{protocol}}{{host}}:{{port}}/games
+Content-Type: application/json
+Accept: application/json
+
+{
+  "steam_key": "NEW_KEY",
+  "name": 2,
+  "publisher": "PUBLISHER",
+  "genre": "GENRE"
+}
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 400, "Response status is not 400")
+        }
+    );
+%}
+
+###
+DELETE {{protocol}}{{host}}:{{port}}/games/2
+Accept: application/json
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 204, "Response status is not 204")
+        }
+    );
+%}
+
+###
+DELETE {{protocol}}{{host}}:{{port}}/games/japp
+Accept: application/json
+
+> {%
+    client.test(
+        "Request executed succesfully", function () {
+            client.assert(response.status === 404, "Response status is not 404")
+        }
+    );
+%}
