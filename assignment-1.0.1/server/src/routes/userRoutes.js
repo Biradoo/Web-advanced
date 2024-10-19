@@ -6,7 +6,6 @@ import { verifyRole } from '../middleware/roleMiddleware.js';
 const router = express.Router();
 
 //Admin-only routes
-router.get('/', verifyToken, verifyRole('admin'), getAllUsers); //GET all users
 router.get('/:id', verifyToken, verifyRole('admin'), getUserById); //GET user by ID
 
 //Public route for registration
