@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import users from '../data/users.js';
+import JWT_SECRET from '../utils/jwtSecret.js';
+import { addToken, invalidateToken } from '../utils/tokens.js';
 
 //Login user and generate JWT token
 export const loginUser = async (req, res) => {
@@ -25,7 +27,9 @@ export const loginUser = async (req, res) => {
             id: user.id,
             username: user.username,
             roles: user.roles
-        }, 'secretKey', {expiresIn: '1h'});
+        }, JWT_SECRET, {expiresIn: '1h'});
+        addToken(user.id, token);
+
         return res.status(200).json({
             message: 'Logged in successfully',
             token,
@@ -38,12 +42,16 @@ export const loginUser = async (req, res) => {
     }
 }
 
-export const logoutUser = async (req, res) => {
+export const logoutUser = (req, res) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, 'secret-key');
-        res.status(200).json({message: 'Logged out successfully'});
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(400).json({ message: 'No token provided.' });
+        }
+
+        invalidateToken(token);
+        res.status(200).json({ message: 'Logged out successfully.' });
     } catch (error) {
-        res.status(500).json({message: 'Logout failed'});
+        res.status(500).json({ message: 'Logout failed.' });
     }
-}
+};

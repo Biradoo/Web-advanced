@@ -1,6 +1,8 @@
 import users from '../data/users.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import JWT_SECRET from '../utils/jwtSecret.js';
+
 
 export const getUserById = (req, res) => {
     const user = users.find(u => u.id === parseInt(req.params.id));
@@ -38,7 +40,7 @@ export const register = (req, res) => {
 
     users.push(newUser);
     //Generate JWT token for new user
-    const token = jwt.sign({ id: newUser.id, username: newUser.username, roles: newUser.roles }, 'secretKey', { expiresIn: '1h' });
+    const token = jwt.sign({ id: newUser.id, username: newUser.username, roles: newUser.roles }, JWT_SECRET, { expiresIn: '1h' });
     //Send token back to client
     return res.json({ message: 'Registration successful', token, username: { id: newUser.id, username: newUser.username, roles: newUser.roles } });
 };

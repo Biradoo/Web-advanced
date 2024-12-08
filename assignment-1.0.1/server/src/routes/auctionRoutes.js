@@ -9,7 +9,7 @@ import {
     placeBid,
     endAuction,
 } from '../controllers/auctionController.js';
-import verifyToken from '../middleware/authMiddleware.js';
+import {verifyToken} from '../middleware/authMiddleware.js';
 import {verifyRole} from '../middleware/roleMiddleware.js';
 import {handleSSEConnection} from '../services/sseManager.js';
 
@@ -22,7 +22,6 @@ router.get('/stream', handleSSEConnection);
 router.get('/', getAuctions);  //GET all auctions
 router.get('/:id', getAuctionById); //GET auction by ID
 router.get('/:id/bids', getBids); //GET all bids for auction
-
 
 // Admin-only routes
 router.post('/', verifyToken, verifyRole('admin'), addAuction); //POST new auction

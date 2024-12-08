@@ -1,18 +1,22 @@
+// authMiddleware.js
 import jwt from 'jsonwebtoken';
+import JWT_SECRET from '../utils/jwtSecret.js';
+import {validateToken} from '../utils/tokens.js';
 
-function verifyToken(req, res, next) {
-    const token = req.headers.authorization.split(' ')[1];
-
+export const verifyToken = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
-        return res.status(403).json({ message: 'No token provided.'});
+        return res.status(403).json({ message: 'No token provided.' });
+    }
+
+    if (!validateToken(token)) {
+        return res.status(401).json({ message: 'Token is invalid or expired.' });
     }
 
     try {
-        const decoded = jwt.verify(token, 'secretKey');
-        req.user = decoded;
+        req.user = jwt.verify(token, JWT_SECRET);
         next();
     } catch (error) {
-        return res.status(401).json({ message: 'Invalid or expired token' });
+        res.status(401).json({ message: 'Invalid token.' });
     }
-}
-export default verifyToken;
+};
